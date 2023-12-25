@@ -216,6 +216,9 @@ def anima(i):
 
     RArrowX_W, RArrowY_W = Rot2D(ArrowX, ArrowY, math.atan2(WY[i], WX[i]))
     WArrow.set_data(RArrowX_W+X[i]+WX[i], RArrowY_W+Y[i]+WY[i])
+    
+    RArrowX_CurveLine, RArrowY_CurveLine = Rot2D(ArrowX, ArrowY, math.atan2(WY[i], WX[i]))
+    CurveLineArrow.set_data(RArrowX_CurveLine+X[i]+CurveX[i], RArrowY_CurveLine+Y[i]+CurveY[i])
     return P
 
 '''
