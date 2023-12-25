@@ -4,53 +4,46 @@ import matplotlib
 from matplotlib.animation import FuncAnimation
 from matplotlib import pyplot as plt
 from scipy.integrate import odeint
-import sympy as sp
 import math
 
 t_fin = 20
-steps = 1001
-T = np.linspace(0, t_fin, steps)
+t = np.linspace(0, t_fin, 1001)
+
+s = 0.8 * np.sin(5 * t)
+phi = 5 * np.sin(2*t)
+
+x0 = 8
+R = 1 # Радиус обруча
+
 angles = np.linspace(0, 2 * pi, 360)
-
-t = sp.Symbol('t')
-
-phi = sp.sin(t)
-s = sp.cos(t)
-
 
 box_w = 0.4
 box_h = 0.2
+
+spting_steps = 100
+
 def spring(k, h, w):
-    x = np.linspace(0, h, 100)
+    x = np.linspace(0, h, spting_steps)
     return np.array([x, np.sin(2 * math.pi / (h / k) * x) * w])
 
 box_x_tmp = np.array([-box_h / 2, -box_h / 2, box_h / 2, box_h / 2, -box_h / 2])
 box_y_tmp = np.array([-box_w / 2, box_w / 2, box_w / 2, -box_w / 2, -box_w / 2])
 
-F_friction = np.zeros(1001)
-N = np.zeros(1001)
+ring_dots_x = np.zeros([len(t), len(angles)])
+ring_dots_y = np.zeros([len(t), len(angles)])
 
-ring_dots_x = np.zeros([1001, 360])
-ring_dots_y = np.zeros([1001, 360])
+box_dots_x = np.zeros([len(t), 5])
+box_dots_y = np.zeros([len(t), 5])
 
-box_dots_x = np.zeros([1001, 5])
-box_dots_y = np.zeros([1001, 5])
+spring_a_x = np.zeros([len(t), spting_steps])
+spring_a_y = np.zeros([len(t), spting_steps])
+spring_b_x = np.zeros([len(t), spting_steps])
+spring_b_y = np.zeros([len(t), spting_steps])
 
-spring_a_x = np.zeros([1001, 100])
-spring_a_y = np.zeros([1001, 100])
-spring_b_x = np.zeros([1001, 100])
-spring_b_y = np.zeros([1001, 100])
+spring_c_x = np.zeros([len(t), spting_steps])
+spring_c_y = np.zeros([len(t), spting_steps])
 
-spring_c_x = np.zeros([1001, 100])
-spring_c_y = np.zeros([1001, 100])
-
-R = 1
-x0 = 4
-
-for i in range(1001):
-    F_friction[i] = (m1 + m2) * R * ddphi[i] - m2 * (dds[i] - s[i] * dphi[i]**2) * np.cos(phi[i]) + m2*(2*ds[i]*dphi[i] + s[i]*ddphi[i]) * np.sin(phi[i]) + c1*R*phi[i]
-
-    N[i] = m2*((dds[i] - s[i]*(dphi[i]**2))*np.sin(phi[i])+(2*ds[i]*dphi[i] + s[i]*ddphi[i])*np.cos(phi[i])) + (m1+m2)*g
+for i in range(len(t)):
 
     ring_x = x0 + phi[i] * R
     ring_y = R
@@ -76,37 +69,11 @@ for i in range(1001):
     spring_c_x[i] = np.cos(phi[i]) * c_x + np.sin(phi[i]) * c_y + ring_x
     spring_c_y[i] = -np.sin(phi[i]) * c_x + np.cos(phi[i]) * c_y + ring_y
 
-# fig_for_graphs = plt.figure(figsize=[13, 7])
-
-# ax_for_graphs = fig_for_graphs.add_subplot(2, 2, 1)
-# ax_for_graphs.plot(t, F_friction, color='black')
-# ax_for_graphs.set_title("F(t)")
-# ax_for_graphs.set(xlim=[0, t_fin])
-# ax_for_graphs.grid(True)
-
-# ax_for_graphs = fig_for_graphs.add_subplot(2, 2, 2)
-# ax_for_graphs.plot(t, N, color='black')
-# ax_for_graphs.set_title("N(t)")
-# ax_for_graphs.set(xlim=[0, t_fin])
-# ax_for_graphs.grid(True)
-
-# ax_for_graphs = fig_for_graphs.add_subplot(2, 2, 3)
-# ax_for_graphs.plot(t, s, color='blue')
-# ax_for_graphs.set_title("s(t)")
-# ax_for_graphs.set(xlim=[0, t_fin])
-# ax_for_graphs.grid(True)
-
-# ax_for_graphs = fig_for_graphs.add_subplot(2, 2, 4)
-# ax_for_graphs.plot(t, phi, color='red')
-# ax_for_graphs.set_title('phi(t)')
-# ax_for_graphs.set(xlim=[0, t_fin])
-# ax_for_graphs.grid(True)
-
 fig = plt.figure()
 ax = fig.add_subplot(1, 1, 1)
 ax.axis("equal")
 
-surface = ax.plot([0, 0, 8], [5, 0, 0], "black")
+surface = ax.plot([0, 0, 15], [5, 0, 0], "black")
 ring, = ax.plot(ring_dots_x[0], ring_dots_y[0], "black")
 box, = ax.plot(box_dots_x[0], box_dots_y[0], "black")
 spring_a, = ax.plot(spring_a_x[0], spring_a_y[0], "red")
