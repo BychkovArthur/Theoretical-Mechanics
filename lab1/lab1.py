@@ -188,6 +188,12 @@ ArrowY_W = np.array([0.1*sizeArrow, 0, -0.1*sizeArrow])
 RArrowX_W, RArrowY_W = Rot2D(ArrowX_W, ArrowY_W, math.atan2(WY[0], WX[0]))
 WArrow, = ax1.plot(RArrowX+X[0]+WX[0], RArrowY+Y[0]+WY[0], 'b')
 
+ArrowX_CurveLine = np.array([-0.2*sizeArrow, 0, -0.2*sizeArrow])
+ArrowY_CurveLine = np.array([0.1*sizeArrow, 0, -0.1*sizeArrow])
+
+RArrowX_CurveLine, RArrowY_CurveLine = Rot2D(ArrowX_W, ArrowY_W, math.atan2(CurveY[0], CurveX[0]))
+CurveLineArrow, = ax1.plot(RArrowX+X[0]+CurveX[0], RArrowY+Y[0]+CurveY[0], 'c')
+
 '''
     Функция, производящая анимацию
 '''
