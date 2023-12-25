@@ -4,16 +4,19 @@ import matplotlib
 from matplotlib.animation import FuncAnimation
 from matplotlib import pyplot as plt
 from scipy.integrate import odeint
+import sympy as sp
 import math
 
 t_fin = 20
-t = np.linspace(0, t_fin, 1001)
-
-
-phi = np.sin(t)
-s = np.cos(t)
-
+steps = 1001
+T = np.linspace(0, t_fin, steps)
 angles = np.linspace(0, 2 * pi, 360)
+
+t = sp.Symbol('t')
+
+phi = sp.sin(t)
+s = sp.cos(t)
+
 
 box_w = 0.4
 box_h = 0.2
@@ -24,8 +27,8 @@ def spring(k, h, w):
 box_x_tmp = np.array([-box_h / 2, -box_h / 2, box_h / 2, box_h / 2, -box_h / 2])
 box_y_tmp = np.array([-box_w / 2, box_w / 2, box_w / 2, -box_w / 2, -box_w / 2])
 
-F_friction = np.zeros(len(t))
-N = np.zeros(len(t))
+# F_friction = np.zeros(len(t))
+# N = np.zeros(len(t))
 
 ring_dots_x = np.zeros([len(t), len(angles)])
 ring_dots_y = np.zeros([len(t), len(angles)])
@@ -41,36 +44,39 @@ spring_b_y = np.zeros([len(t), 100])
 spring_c_x = np.zeros([len(t), 100])
 spring_c_y = np.zeros([len(t), 100])
 
-# for i in range(len(t)):
-#     F_friction[i] = (m1 + m2) * R * ddphi[i] - m2 * (dds[i] - s[i] * dphi[i]**2) * np.cos(phi[i]) + m2*(2*ds[i]*dphi[i] + s[i]*ddphi[i]) * np.sin(phi[i]) + c1*R*phi[i]
+R = 1
+x0 = 4
 
-#     N[i] = m2*((dds[i] - s[i]*(dphi[i]**2))*np.sin(phi[i])+(2*ds[i]*dphi[i] + s[i]*ddphi[i])*np.cos(phi[i])) + (m1+m2)*g
+for i in range(len(t)):
+    # F_friction[i] = (m1 + m2) * R * ddphi[i] - m2 * (dds[i] - s[i] * dphi[i]**2) * np.cos(phi[i]) + m2*(2*ds[i]*dphi[i] + s[i]*ddphi[i]) * np.sin(phi[i]) + c1*R*phi[i]
 
-#     ring_x = x0 + phi[i] * R
-#     ring_y = R
+    # N[i] = m2*((dds[i] - s[i]*(dphi[i]**2))*np.sin(phi[i])+(2*ds[i]*dphi[i] + s[i]*ddphi[i])*np.cos(phi[i])) + (m1+m2)*g
 
-#     ring_dots_x[i] = np.cos(phi[i]) * R * np.cos(angles) + np.sin(phi[i]) * R * np.sin(angles) + ring_x
-#     ring_dots_y[i] = - np.sin(phi[i]) * R * np.cos(angles) + np.cos(phi[i]) * R * np.sin(angles) + ring_y
+    ring_x = x0 + phi[i] * R
+    ring_y = R
 
-#     bx = box_x_tmp - s[i]
-#     by = box_y_tmp
-#     box_dots_x[i] = np.cos(phi[i]) * bx + np.sin(phi[i]) * by + ring_x
-#     box_dots_y[i] = - np.sin(phi[i]) * bx + np.cos(phi[i]) * by + ring_y
+    ring_dots_x[i] = np.cos(phi[i]) * R * np.cos(angles) + np.sin(phi[i]) * R * np.sin(angles) + ring_x
+    ring_dots_y[i] = - np.sin(phi[i]) * R * np.cos(angles) + np.cos(phi[i]) * R * np.sin(angles) + ring_y
 
-#     spring_a_x[i] = spring(5, ring_x, 0.2)[0]
-#     spring_a_y[i] = spring(5, ring_x, 0.2)[1] + ring_y
+    bx = box_x_tmp - s[i]
+    by = box_y_tmp
+    box_dots_x[i] = np.cos(phi[i]) * bx + np.sin(phi[i]) * by + ring_x
+    box_dots_y[i] = - np.sin(phi[i]) * bx + np.cos(phi[i]) * by + ring_y
 
-#     b_x = R - spring(10, R + s[i] - box_h / 2, 0.16)[0]
-#     b_y = spring(10, R - s[i], 0.16)[1]
-#     spring_b_x[i] = np.cos(phi[i]) * b_x + np.sin(phi[i]) * b_y + ring_x
-#     spring_b_y[i] = -np.sin(phi[i]) * b_x + np.cos(phi[i]) * b_y + ring_y
+    spring_a_x[i] = spring(5, ring_x, 0.2)[0]
+    spring_a_y[i] = spring(5, ring_x, 0.2)[1] + ring_y
 
-#     c_x = spring(10, R - s[i] - box_h / 2, 0.16)[0] - R
-#     c_y = spring(10, R - s[i], 0.16)[1]
-#     spring_c_x[i] = np.cos(phi[i]) * c_x + np.sin(phi[i]) * c_y + ring_x
-#     spring_c_y[i] = -np.sin(phi[i]) * c_x + np.cos(phi[i]) * c_y + ring_y
+    b_x = R - spring(10, R + s[i] - box_h / 2, 0.16)[0]
+    b_y = spring(10, R - s[i], 0.16)[1]
+    spring_b_x[i] = np.cos(phi[i]) * b_x + np.sin(phi[i]) * b_y + ring_x
+    spring_b_y[i] = -np.sin(phi[i]) * b_x + np.cos(phi[i]) * b_y + ring_y
 
-# fig_for_graphs = plt.figure(figsize=[13, 7])
+    c_x = spring(10, R - s[i] - box_h / 2, 0.16)[0] - R
+    c_y = spring(10, R - s[i], 0.16)[1]
+    spring_c_x[i] = np.cos(phi[i]) * c_x + np.sin(phi[i]) * c_y + ring_x
+    spring_c_y[i] = -np.sin(phi[i]) * c_x + np.cos(phi[i]) * c_y + ring_y
+
+fig_for_graphs = plt.figure(figsize=[13, 7])
 
 ax_for_graphs = fig_for_graphs.add_subplot(2, 2, 1)
 ax_for_graphs.plot(t, F_friction, color='black')
