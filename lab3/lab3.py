@@ -97,20 +97,32 @@ for i in range(len(t)):
 
     N[i] = m2*((dds[i] - s[i]*(dphi[i]**2))*np.sin(phi[i])+(2*ds[i]*dphi[i] + s[i]*ddphi[i])*np.cos(phi[i])) + (m1+m2)*g
 
+    '''
+        Сам обруч
+    '''
     ring_x = x0 + phi[i] * R
     ring_y = R
 
     ring_dots_x[i] = np.cos(phi[i]) * R * np.cos(angles) + np.sin(phi[i]) * R * np.sin(angles) + ring_x
     ring_dots_y[i] = - np.sin(phi[i]) * R * np.cos(angles) + np.cos(phi[i]) * R * np.sin(angles) + ring_y
 
+    '''
+        Грузик
+    '''
     bx = box_x_tmp - s[i]
     by = box_y_tmp
     box_dots_x[i] = np.cos(phi[i]) * bx + np.sin(phi[i]) * by + ring_x
     box_dots_y[i] = - np.sin(phi[i]) * bx + np.cos(phi[i]) * by + ring_y
 
+    '''
+        Пружинка от стены к обручу
+    '''
     spring_a_x[i] = spring(5, ring_x, 0.2)[0]
     spring_a_y[i] = spring(5, ring_x, 0.2)[1] + ring_y
 
+    '''
+        Пружинки внутри обруча
+    '''
     b_x = R - spring(10, R + s[i] - box_h / 2, 0.16)[0]
     b_y = spring(10, R - s[i], 0.16)[1]
     spring_b_x[i] = np.cos(phi[i]) * b_x + np.sin(phi[i]) * b_y + ring_x
@@ -121,6 +133,10 @@ for i in range(len(t)):
     spring_c_x[i] = np.cos(phi[i]) * c_x + np.sin(phi[i]) * c_y + ring_x
     spring_c_y[i] = -np.sin(phi[i]) * c_x + np.cos(phi[i]) * c_y + ring_y
 
+
+'''
+    Графики
+'''
 fig_for_graphs = plt.figure(figsize=[13, 7])
 
 ax_for_graphs = fig_for_graphs.add_subplot(2, 2, 1)

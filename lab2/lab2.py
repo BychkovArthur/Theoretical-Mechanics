@@ -13,7 +13,7 @@ s = 0.8 * np.sin(5 * t)
 phi = 5 * np.sin(2*t)
 
 x0 = 8
-R = 1 # Радиус обруча
+R = 1
 
 angles = np.linspace(0, 2 * pi, 360)
 
@@ -22,13 +22,22 @@ box_h = 0.2
 
 spting_steps = 100
 
+'''
+    Для создания пружины
+'''
 def spring(k, h, w):
     x = np.linspace(0, h, spting_steps)
     return np.array([x, np.sin(2 * math.pi / (h / k) * x) * w])
 
+'''
+    Отрисовываем грузик
+'''
 box_x_tmp = np.array([-box_h / 2, -box_h / 2, box_h / 2, box_h / 2, -box_h / 2])
 box_y_tmp = np.array([-box_w / 2, box_w / 2, box_w / 2, -box_w / 2, -box_w / 2])
 
+'''
+    Заполняем всё нулями
+'''
 ring_dots_x = np.zeros([len(t), len(angles)])
 ring_dots_y = np.zeros([len(t), len(angles)])
 
@@ -43,22 +52,34 @@ spring_b_y = np.zeros([len(t), spting_steps])
 spring_c_x = np.zeros([len(t), spting_steps])
 spring_c_y = np.zeros([len(t), spting_steps])
 
-for i in range(len(t)):
 
+for i in range(len(t)):
+    '''
+        Сам обруч
+    '''
     ring_x = x0 + phi[i] * R
     ring_y = R
 
     ring_dots_x[i] = np.cos(phi[i]) * R * np.cos(angles) + np.sin(phi[i]) * R * np.sin(angles) + ring_x
     ring_dots_y[i] = - np.sin(phi[i]) * R * np.cos(angles) + np.cos(phi[i]) * R * np.sin(angles) + ring_y
 
+    '''
+        Грузик
+    '''
     bx = box_x_tmp - s[i]
     by = box_y_tmp
     box_dots_x[i] = np.cos(phi[i]) * bx + np.sin(phi[i]) * by + ring_x
     box_dots_y[i] = - np.sin(phi[i]) * bx + np.cos(phi[i]) * by + ring_y
 
+    '''
+        Пружинка от стены к обручу
+    '''
     spring_a_x[i] = spring(5, ring_x, 0.2)[0]
     spring_a_y[i] = spring(5, ring_x, 0.2)[1] + ring_y
 
+    '''
+        Пружинки внутри обруча
+    '''
     b_x = R - spring(10, R + s[i] - box_h / 2, 0.16)[0]
     b_y = spring(10, R - s[i], 0.16)[1]
     spring_b_x[i] = np.cos(phi[i]) * b_x + np.sin(phi[i]) * b_y + ring_x
